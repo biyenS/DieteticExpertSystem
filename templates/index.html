@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dietetic Expert System</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body style="background-image: url('image/food.jpg');">
+
+<div class="container">
+    <h1>Dietetic Expert System</h1>
+    <form id="bmiForm" onsubmit="return validateForm()">
+        <label for="age">Age:</label>
+        <input type="text" id="age" name="age"><br><br>
+        <label for="weight">Weight (kg):</label>
+        <input type="text" id="weight" name="weight"><br><br>
+        <label for="height">Height (m):</label>
+        <input type="text" id="height" name="height"><br><br>
+        <label for="goal">Select your goal:</label>
+        <select id="goal" name="goal">
+            <option value="gain_weight">Gain Weight</option>
+            <option value="lose_weight">Lose Weight</option>
+        </select><br><br>
+        <button type="button" onclick="calculateBMI()">Calculate BMI and Recommend Diet</button>
+    </form>
+    <div id="resultContainer"></div>
+</div>
+
+<script>
+    function validateForm() {
+        const weight = document.getElementById('weight').value.trim();
+        const height = document.getElementById('height').value.trim();
+        const age = document.getElementById('age').value.trim();
+        let isValid = true;
+
+        // Check if weight is empty
+        if (weight === '') {
+            alert('Please enter weight.');
+            isValid = false;
+        }
+        // Check if height is empty
+        else if (height === '') {
+            alert('Please enter height.');
+            isValid = false;
+        }
+        // Check if age is empty
+        else if (age === '') {
+            alert('Please enter age.');
+            isValid = false;
+        }
+        // Check if weight is a valid number and within range
+        else if (isNaN(weight) || parseFloat(weight) <= 30 || parseFloat(weight) > 200) {
+            alert('Invalid weight. Please enter a valid weight between 30 and 200 kg.');
+            isValid = false;
+        }
+        // Check if height is a valid number and within range
+        else if (isNaN(height) || parseFloat(height) <= 1 || parseFloat(height) > 2) {
+            alert('Invalid height. Please enter a valid height between 1 and 2 meters.');
+            isValid = false;
+        }
+        // Check if age is a valid number and within range
+        else if (isNaN(age) || parseInt(age) <= 18 || parseInt(age) > 80) {
+            alert('Invalid age. Please enter a valid age between 18 and 80years.');
+            isValid = false;
+        }
+
+        return isValid;  // Form is valid if all fields are valid
+    }
+
+    function calculateBMI() {
+        const weight = document.getElementById('weight').value;
+        const height = document.getElementById('height').value;
+        const age = document.getElementById('age').value;
+        const goal = document.getElementById('goal').value;
+
+        // Validate input before sending the request
+        if (!validateForm()) {
+            return; // Exit function if input is invalid
+        }
+
+        const formData = new FormData();
+        formData.append('weight', weight);
+        formData.append('height', height);
+        formData.append('age', age);
+        formData.append('goal', goal);
+
+        fetch('/result', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(result => {
+            document.getElementById('resultContainer').innerHTML = result;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('resultContainer').innerHTML = 'An error occurred while processing the request.';
+        });
+    }
+</script>
+</body>
+</html>
